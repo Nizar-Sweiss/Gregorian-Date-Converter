@@ -1,13 +1,14 @@
 import 'package:flutter/material.dart';
+import '../date_convertor_class.dart';
 
-class DateConvertor extends StatefulWidget {
-  const DateConvertor({super.key});
+class MainScreen extends StatefulWidget {
+  const MainScreen({super.key});
 
   @override
-  State<DateConvertor> createState() => _DateConvertorState();
+  State<MainScreen> createState() => _MainScreenState();
 }
 
-class _DateConvertorState extends State<DateConvertor> {
+class _MainScreenState extends State<MainScreen> {
   int _selectedIndex = 0;
 
   void _onItemTapped(int index) {
@@ -16,10 +17,20 @@ class _DateConvertorState extends State<DateConvertor> {
     });
   }
 
+  List<Widget> widgetOptions = <Widget>[
+    DateConvertor(),
+    Text(
+      'Index 1: Business',
+    ),
+  ];
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: SafeArea(child: Container()),
+      body: SafeArea(
+        child: Center(
+          child: widgetOptions.elementAt(_selectedIndex),
+        ),
+      ),
       bottomNavigationBar: BottomNavigationBar(
         items: const <BottomNavigationBarItem>[
           BottomNavigationBarItem(
@@ -32,7 +43,7 @@ class _DateConvertorState extends State<DateConvertor> {
           ),
         ],
         currentIndex: _selectedIndex,
-        selectedItemColor: Colors.amber[800],
+        selectedItemColor: const Color.fromARGB(255, 82, 42, 145),
         onTap: _onItemTapped,
       ),
     );
