@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:app/Presentation/Widgets/date_displayer.dart';
 import 'package:intl/intl.dart';
 import 'package:flutter/material.dart';
 import 'package:table_calendar/table_calendar.dart';
@@ -35,16 +36,22 @@ class _DateConvertorState extends State<DateConvertor> {
       ),
       body: Center(
           child: Column(children: [
-        TableCalendar(
-          selectedDayPredicate: (day) => isSameDay(day, today),
-          focusedDay: today,
-          firstDay: firstDay,
-          lastDay: lastDay,
-          onDaySelected: _onDaySelected,
-        ),
+        BuildTableCalendar(),
         Text(
             "Selected Date : ${today.toString().split(" ")[0]} ,In Hijri : $DateTest"),
+        buildDateDisplayer(isGregorianColor: true, date: "date"),
+        buildDateDisplayer(isGregorianColor: false, date: "date"),
       ])),
+    );
+  }
+
+  TableCalendar<dynamic> BuildTableCalendar() {
+    return TableCalendar(
+      selectedDayPredicate: (day) => isSameDay(day, today),
+      focusedDay: today,
+      firstDay: firstDay,
+      lastDay: lastDay,
+      onDaySelected: _onDaySelected,
     );
   }
 

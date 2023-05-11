@@ -31,21 +31,25 @@ class _MainScreenState extends State<MainScreen> {
           child: widgetOptions.elementAt(_selectedIndex),
         ),
       ),
-      bottomNavigationBar: BottomNavigationBar(
-        items: const <BottomNavigationBarItem>[
-          BottomNavigationBarItem(
-            icon: Icon(Icons.home),
-            label: 'Home',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.date_range),
-            label: 'Calender',
-          ),
-        ],
-        currentIndex: _selectedIndex,
-        selectedItemColor: const Color.fromARGB(255, 82, 42, 145),
-        onTap: _onItemTapped,
-      ),
+      bottomNavigationBar: buildBottomNavigationBar(),
+    );
+  }
+
+  BottomNavigationBar buildBottomNavigationBar() {
+    return BottomNavigationBar(
+      items: const <BottomNavigationBarItem>[
+        BottomNavigationBarItem(
+          icon: Icon(Icons.home),
+          label: 'Home',
+        ),
+        BottomNavigationBarItem(
+          icon: Icon(Icons.date_range),
+          label: 'Calender',
+        ),
+      ],
+      currentIndex: _selectedIndex,
+      selectedItemColor: const Color.fromARGB(255, 82, 42, 145),
+      onTap: _onItemTapped,
     );
   }
 }
