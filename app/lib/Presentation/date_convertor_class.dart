@@ -4,6 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:table_calendar/table_calendar.dart';
 import 'package:http/http.dart' as http;
 
+DateTime today = DateTime.now();
+
 class DateConvertor extends StatefulWidget {
   const DateConvertor({super.key});
 
@@ -12,13 +14,16 @@ class DateConvertor extends StatefulWidget {
 }
 
 class _DateConvertorState extends State<DateConvertor> {
-  DateTime today = DateTime.now();
   DateTime firstDay = DateTime.utc(1900, 1, 1);
   DateTime lastDay = DateTime.utc(2040, 1, 1);
-  String DateTest = "ccc";
+
+  String DateTest = DateFormat('dd-mm-yyy').format(today);
   void _onDaySelected(DateTime day, DateTime focusedDay) {
+    String gregorianDate = dateFormater();
+
     setState(() {
       today = day;
+      displayHijriDate();
     });
   }
 
@@ -37,21 +42,25 @@ class _DateConvertorState extends State<DateConvertor> {
           lastDay: lastDay,
           onDaySelected: _onDaySelected,
         ),
-        Text("Selected Date : ${today.toString().split(" ")[0]} "),
-        TextButton(
-            onPressed: () async {
-              String gregorianDate = dateFormater();
-              if (gregorianDate.isNotEmpty) {
-                // Call API to convert date
-                String hijriDate = await convertDate(gregorianDate);
-                setState(() {
-                  DateTest = hijriDate;
-                });
-              }
-            },
-            child: Text(DateTest))
+        Text(
+            "Selected Date : ${today.toString().split(" ")[0]} ,In Hijri : $DateTest"),
       ])),
     );
+  }
+
+  displayHijriDate() async {
+    String gregorianDate = dateFormater();
+    if (gregorianDate.isNotEmpty) {
+      // Call API to convert date
+      String hijriDate = await convertDate(gregorianDate);
+      setState(() {
+        DateTest = hijriDate;
+      });
+    }
+  }
+
+  String getTodayDate() {
+    return DateFormat('dd-mm-yyy').format(today);
   }
 
   Future<String> convertDate(String gregorianDate) async {
