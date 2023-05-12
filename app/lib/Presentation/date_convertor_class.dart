@@ -19,9 +19,9 @@ class _DateConvertorState extends State<DateConvertor> {
   DateTime lastDay = DateTime.utc(2040, 1, 1);
 
   String DateTest = DateFormat('dd-mm-yyy').format(today);
-  void _onDaySelected(DateTime day, DateTime focusedDay) {
-    String gregorianDate = dateFormater();
 
+  TextEditingController eventData = TextEditingController();
+  void _onDaySelected(DateTime day, DateTime focusedDay) {
     setState(() {
       today = day;
       displayHijriDate();
@@ -39,8 +39,73 @@ class _DateConvertorState extends State<DateConvertor> {
         BuildTableCalendar(),
         Text(
             "Selected Date : ${today.toString().split(" ")[0]} ,In Hijri : $DateTest"),
-        buildDateDisplayer(isGregorianColor: true, date: "date"),
-        buildDateDisplayer(isGregorianColor: false, date: "date"),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceAround,
+          children: [
+            buildDateDisplayer(isGregorianColor: true, date: "date"),
+            buildDateDisplayer(isGregorianColor: false, date: "date"),
+          ],
+        ),
+        ElevatedButton(
+            onPressed: () {
+              showModalBottomSheet(
+                  useSafeArea: true,
+                  context: context,
+                  builder: (BuildContext context) {
+                    return Container(
+                      height: 200,
+                      child: Column(
+                        children: [
+                          TextFormField(
+                            controller: eventData,
+                            decoration: const InputDecoration(
+                              errorMaxLines: 2,
+                              labelText: 'Enter text',
+                              hintText: 'Enter your text here',
+                            ),
+                          ),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceAround,
+                            children: [
+                              SizedBox(
+                                height: 40,
+                                width: 100,
+                                child: ElevatedButton(
+                                  style: ButtonStyle(
+                                    backgroundColor:
+                                        MaterialStateProperty.all<Color>(Colors
+                                            .red), // Set the desired color here
+                                  ),
+                                  onPressed: () {
+                                    Navigator.pop(context);
+                                  },
+                                  child: Text('Cancel'),
+                                ),
+                              ),
+                              SizedBox(
+                                height: 40,
+                                width: 100,
+                                child: ElevatedButton(
+                                  style: ButtonStyle(
+                                    backgroundColor:
+                                        MaterialStateProperty.all<Color>(Colors
+                                            .green), // Set the desired color here
+                                  ),
+                                  onPressed: () {
+                                    Navigator.pop(context);
+                                    //Add the data to the Data Base .
+                                  },
+                                  child: Text('Add'),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
+                    );
+                  });
+            },
+            child: Text("Add Event")),
       ])),
     );
   }
