@@ -1,3 +1,4 @@
+import 'package:app/Presentation/display_events_screen.dart';
 import 'package:flutter/material.dart';
 import '../date_convertor_class.dart';
 
@@ -17,12 +18,7 @@ class _MainScreenState extends State<MainScreen> {
     });
   }
 
-  List<Widget> widgetOptions = <Widget>[
-    DateConvertor(),
-    Text(
-      'Index 1: Business',
-    ),
-  ];
+  List<Widget> widgetOptions = <Widget>[DateConvertor(), DisplayEvent()];
   @override
   Widget build(BuildContext context) {
     return Scaffold(

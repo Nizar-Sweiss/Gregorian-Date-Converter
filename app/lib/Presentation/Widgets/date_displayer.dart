@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 
 class buildDateDisplayer extends StatelessWidget {
   final bool isGregorianColor;
-  final String date;
+  DateTime date;
 
   buildDateDisplayer(
       {super.key, required this.isGregorianColor, required this.date});
@@ -14,7 +14,7 @@ class buildDateDisplayer extends StatelessWidget {
       children: [
         Text(
           isGregorianColor ? "Gregorian" : "Hijri",
-          style: TextStyle(color: Colors.white),
+          style: TextStyle(color: const Color.fromARGB(255, 0, 0, 0)),
         ),
         Container(
           width: 120,
@@ -28,8 +28,8 @@ class buildDateDisplayer extends StatelessWidget {
               border: Border.all(color: Colors.black)),
           child: Center(
             child: Text(
-              date,
-              style: TextStyle(color: Colors.white),
+              date.toString(),
+              style: TextStyle(color: const Color.fromARGB(255, 0, 0, 0)),
             ),
           ),
         ),

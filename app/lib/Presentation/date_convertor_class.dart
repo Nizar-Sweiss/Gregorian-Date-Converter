@@ -7,7 +7,7 @@ import 'package:table_calendar/table_calendar.dart';
 import 'package:http/http.dart' as http;
 
 DateTime today = DateTime.now();
-String selectedDate = "";
+String selectedDate = today.toString();
 
 class DateConvertor extends StatefulWidget {
   const DateConvertor({super.key});
@@ -47,8 +47,9 @@ class _DateConvertorState extends State<DateConvertor> {
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceAround,
           children: [
-            buildDateDisplayer(isGregorianColor: true, date: "date"),
-            buildDateDisplayer(isGregorianColor: false, date: "date"),
+            buildDateDisplayer(
+                isGregorianColor: true, date: dateFormaterr(selectedDate)),
+            buildDateDisplayer(isGregorianColor: false, date: today),
           ],
         ),
         ElevatedButton(
@@ -180,5 +181,12 @@ class _DateConvertorState extends State<DateConvertor> {
     print(formate1);
 
     return formate1; // Output: Mon, May 9, 2023
+  }
+
+  DateTime dateFormaterr(String theDate) {
+    DateFormat inputFormat = DateFormat('yyyy-MM-dd');
+    DateTime date = inputFormat.parse(theDate);
+
+    return date; // Output: Mon, May 9, 2023
   }
 }
