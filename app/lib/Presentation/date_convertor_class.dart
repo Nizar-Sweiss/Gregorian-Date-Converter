@@ -1,11 +1,13 @@
 import 'dart:convert';
 import 'package:app/Presentation/Widgets/date_displayer.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:intl/intl.dart';
 import 'package:flutter/material.dart';
 import 'package:table_calendar/table_calendar.dart';
 import 'package:http/http.dart' as http;
 
 DateTime today = DateTime.now();
+String selectedDate = "";
 
 class DateConvertor extends StatefulWidget {
   const DateConvertor({super.key});
@@ -18,12 +20,15 @@ class _DateConvertorState extends State<DateConvertor> {
   DateTime firstDay = DateTime.utc(1900, 1, 1);
   DateTime lastDay = DateTime.utc(2040, 1, 1);
 
-  String DateTest = DateFormat('dd-mm-yyy').format(today);
+  String dateTest = DateFormat('dd-MM-yyyy').format(today);
+
+  final FirebaseFirestore firestore = FirebaseFirestore.instance;
 
   TextEditingController eventData = TextEditingController();
   void _onDaySelected(DateTime day, DateTime focusedDay) {
     setState(() {
       today = day;
+
       displayHijriDate();
     });
   }
@@ -38,7 +43,7 @@ class _DateConvertorState extends State<DateConvertor> {
           child: Column(children: [
         BuildTableCalendar(),
         Text(
-            "Selected Date : ${today.toString().split(" ")[0]} ,In Hijri : $DateTest"),
+            "Selected Date : ${today.toString().split(" ")[0]} ,In Hijri : $dateTest"),
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceAround,
           children: [
@@ -92,6 +97,14 @@ class _DateConvertorState extends State<DateConvertor> {
                                             .green), // Set the desired color here
                                   ),
                                   onPressed: () {
+                                    addDataToFirebase(eventData.text, today);
+                                    // Map<String, dynamic> data = {
+                                    //   today.toString(),
+                                    //   ""
+                                    // } as Map<String, dynamic>;
+                                    // FirebaseFirestore.instance
+                                    //     .collection("Events")
+                                    //     .add(data);
                                     Navigator.pop(context);
                                     //Add the data to the Data Base .
                                   },
@@ -110,6 +123,17 @@ class _DateConvertorState extends State<DateConvertor> {
     );
   }
 
+  void addDataToFirebase(String text, DateTime selectedDate) {
+    firestore.collection('Data').add({
+      'text': text,
+      'date': DateFormat('dd-MM-yyyy').format(selectedDate),
+    }).then((value) {
+      // Data added successfully
+    }).catchError((error) {
+      // Error occurred while adding data
+    });
+  }
+
   TableCalendar<dynamic> BuildTableCalendar() {
     return TableCalendar(
       selectedDayPredicate: (day) => isSameDay(day, today),
@@ -122,11 +146,12 @@ class _DateConvertorState extends State<DateConvertor> {
 
   displayHijriDate() async {
     String gregorianDate = dateFormater();
+    selectedDate = gregorianDate;
     if (gregorianDate.isNotEmpty) {
       // Call API to convert date
       String hijriDate = await convertDate(gregorianDate);
       setState(() {
-        DateTest = hijriDate;
+        dateTest = hijriDate;
       });
     }
   }
