@@ -41,6 +41,7 @@ dependencies:
   cloud_firestore_platform_interface:
   cloud_firestore: ^4.7.0
   firebase_auth:
+  hijri:
 
 dev_dependencies:
   flutter_test:

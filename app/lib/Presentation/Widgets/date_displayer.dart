@@ -1,36 +1,39 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:hijri/hijri_calendar.dart';
 
-class buildDateDisplayer extends StatelessWidget {
+// ignore: must_be_immutable
+class BuildDateDisplayer extends StatelessWidget {
   final bool isGregorianColor;
   DateTime date;
 
-  buildDateDisplayer(
+  BuildDateDisplayer(
       {super.key, required this.isGregorianColor, required this.date});
 
   @override
   Widget build(BuildContext context) {
+    print("DAtee in CW ::::: $date");
     return Column(
       mainAxisSize: MainAxisSize.max,
       children: [
         Text(
           isGregorianColor ? "Gregorian" : "Hijri",
-          style: TextStyle(color: const Color.fromARGB(255, 0, 0, 0)),
+          style: const TextStyle(color: Color.fromARGB(255, 0, 0, 0)),
         ),
         Container(
           width: 120,
           height: 21,
           decoration: BoxDecoration(
               color: isGregorianColor
-                  ? Color.fromARGB(255, 223, 41, 0)
-                  : Color.fromARGB(255, 0, 115, 202),
+                  ? const Color.fromARGB(255, 223, 41, 0)
+                  : const Color.fromARGB(255, 0, 115, 202),
               borderRadius: const BorderRadius.only(
                   topLeft: Radius.circular(20), topRight: Radius.circular(20)),
               border: Border.all(color: Colors.black)),
           child: Center(
             child: Text(
               date.year.toString(),
-              style: TextStyle(color: const Color.fromARGB(255, 0, 0, 0)),
+              style: const TextStyle(color: Color.fromARGB(255, 0, 0, 0)),
             ),
           ),
         ),
@@ -42,16 +45,16 @@ class buildDateDisplayer extends StatelessWidget {
             borderRadius: const BorderRadius.only(
                 bottomLeft: Radius.circular(20),
                 bottomRight: Radius.circular(20)),
-            color: Color.fromARGB(255, 252, 252, 252),
+            color: const Color.fromARGB(255, 252, 252, 252),
           ),
           child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
             Text(
               DateFormat.MMMM().format(date),
-              style: TextStyle(fontSize: 20),
+              style: const TextStyle(fontSize: 20),
             ),
             Text(
               date.day.toString(),
-              style: TextStyle(fontSize: 60),
+              style: const TextStyle(fontSize: 60),
             )
           ]),
         ),

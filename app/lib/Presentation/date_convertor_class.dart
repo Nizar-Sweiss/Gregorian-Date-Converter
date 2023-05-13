@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:app/Presentation/Widgets/date_displayer.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+// ignore: depend_on_referenced_packages
 import 'package:intl/intl.dart';
 import 'package:flutter/material.dart';
 import 'package:table_calendar/table_calendar.dart';
@@ -17,10 +18,10 @@ class DateConvertor extends StatefulWidget {
 }
 
 class _DateConvertorState extends State<DateConvertor> {
-  DateTime firstDay = DateTime.utc(1900, 1, 1);
-  DateTime lastDay = DateTime.utc(2040, 1, 1);
+  final DateTime firstDay = DateTime.utc(1900, 1, 1);
+  final DateTime lastDay = DateTime.utc(2040, 1, 1);
 
-  String dateTest = DateFormat('dd-MM-yyyy').format(today);
+  String theFormatedHijriDate = DateFormat('yyyy-MM-dd').format(today);
 
   final FirebaseFirestore firestore = FirebaseFirestore.instance;
 
@@ -28,7 +29,6 @@ class _DateConvertorState extends State<DateConvertor> {
 
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
     displayHijriDate();
   }
@@ -38,6 +38,7 @@ class _DateConvertorState extends State<DateConvertor> {
       today = day;
 
       displayHijriDate();
+      formatHijriDate(theFormatedHijriDate);
     });
   }
 
@@ -48,24 +49,27 @@ class _DateConvertorState extends State<DateConvertor> {
         title: const Text("Date Convertor"),
       ),
       body: Center(
-          child: Column(children: [
-        BuildTableCalendar(),
-        Text(
-            "Selected Date : ${today.toString().split(" ")[0]} ,In Hijri : $dateTest"),
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceAround,
-          children: [
-            buildDateDisplayer(isGregorianColor: true, date: today),
-            buildDateDisplayer(
-                isGregorianColor: false, date: dateFormaterr(hijriDate)),
-          ],
-        ),
-        ElevatedButton(
-            onPressed: () {
-              buildBottomSheet(context);
-            },
-            child: Text("Add Event")),
-      ])),
+          child: Column(
+              mainAxisAlignment: MainAxisAlignment.spaceAround,
+              children: [
+            buildTableCalendar(),
+            Text(
+                "Selected Date : ${today.toString().split(" ")[0]} ,In Hijri : $theFormatedHijriDate"),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceAround,
+              children: [
+                BuildDateDisplayer(isGregorianColor: true, date: today),
+                BuildDateDisplayer(
+                    isGregorianColor: false,
+                    date: DateTime.parse(theFormatedHijriDate)),
+              ],
+            ),
+            ElevatedButton(
+                onPressed: () {
+                  buildBottomSheet(context);
+                },
+                child: const Text("Add Event")),
+          ])),
     );
   }
 
@@ -74,7 +78,7 @@ class _DateConvertorState extends State<DateConvertor> {
         useSafeArea: true,
         context: context,
         builder: (BuildContext context) {
-          return Container(
+          return SizedBox(
             height: 200,
             child: Column(
               children: [
@@ -100,7 +104,7 @@ class _DateConvertorState extends State<DateConvertor> {
                         onPressed: () {
                           Navigator.pop(context);
                         },
-                        child: Text('Cancel'),
+                        child: const Text('Cancel'),
                       ),
                     ),
                     SizedBox(
@@ -115,7 +119,7 @@ class _DateConvertorState extends State<DateConvertor> {
                           addDataToFirebase(eventData.text, today);
                           Navigator.pop(context);
                         },
-                        child: Text('Add'),
+                        child: const Text('Add'),
                       ),
                     ),
                   ],
@@ -137,7 +141,7 @@ class _DateConvertorState extends State<DateConvertor> {
     });
   }
 
-  TableCalendar<dynamic> BuildTableCalendar() {
+  TableCalendar<dynamic> buildTableCalendar() {
     return TableCalendar(
       selectedDayPredicate: (day) => isSameDay(day, today),
       focusedDay: today,
@@ -152,19 +156,36 @@ class _DateConvertorState extends State<DateConvertor> {
     hijriDate = gregorianDate;
     if (gregorianDate.isNotEmpty) {
       // Call API to convert date
-      String hijriDate = await convertDate(gregorianDate);
+      String hijriDate = await getHijriDate(gregorianDate);
+      print("Hijri ? ::: $hijriDate");
+      DateTime formatedHijriDate = formatHijriDate(hijriDate);
+      print(" hiijjrriiii ??? $formatedHijriDate");
       setState(() {
-        dateTest = hijriDate;
+        theFormatedHijriDate =
+            DateFormat('yyyy-MM-dd').format(formatedHijriDate);
       });
     }
   }
 
-  Future<String> convertDate(String gregorianDate) async {
+  DateTime formatHijriDate(String hijridate) {
+    List<String> dateParts = hijridate.split('-');
+
+    int year = int.parse(dateParts[2]);
+    int month = int.parse(dateParts[1]);
+    int day = int.parse(dateParts[0]);
+    DateTime formatedHijriDate = DateTime(year, month, day);
+
+    print("Formated Hijri Date :::: $formatedHijriDate");
+    return formatedHijriDate;
+  }
+
+  Future<String> getHijriDate(String gregorianDate) async {
     final url = Uri.parse('http://api.aladhan.com/v1/gToH/$gregorianDate');
     final response = await http.get(url);
     // print("Method res : ${response.body}");
     if (response.statusCode == 200) {
       final jsonResponse = jsonDecode(response.body);
+      hijriDate = jsonResponse['data']['hijri']['date'];
       return jsonResponse['data']['hijri']['date'];
     } else {
       throw Exception('Failed to convert date');
@@ -185,6 +206,6 @@ class _DateConvertorState extends State<DateConvertor> {
     DateFormat inputFormat = DateFormat('yyyy-MM-dd');
     DateTime date = inputFormat.parse(theDate);
 
-    return date; // Output: Mon, May 9, 2023
+    return date;
   }
 }
