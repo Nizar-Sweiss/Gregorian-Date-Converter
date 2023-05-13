@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 
 class buildDateDisplayer extends StatelessWidget {
   final bool isGregorianColor;
@@ -28,7 +29,7 @@ class buildDateDisplayer extends StatelessWidget {
               border: Border.all(color: Colors.black)),
           child: Center(
             child: Text(
-              date.toString(),
+              date.year.toString(),
               style: TextStyle(color: const Color.fromARGB(255, 0, 0, 0)),
             ),
           ),
@@ -43,8 +44,24 @@ class buildDateDisplayer extends StatelessWidget {
                 bottomRight: Radius.circular(20)),
             color: Color.fromARGB(255, 252, 252, 252),
           ),
+          child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
+            Text(
+              DateFormat.MMMM().format(date),
+              style: TextStyle(fontSize: 20),
+            ),
+            Text(
+              date.day.toString(),
+              style: TextStyle(fontSize: 60),
+            )
+          ]),
         ),
       ],
     );
+  }
+
+  String convertMonthDate(int month) {
+    DateTime date = DateTime(DateTime.now().year);
+    DateFormat formatter = DateFormat('MMMM');
+    return formatter.format(date);
   }
 }

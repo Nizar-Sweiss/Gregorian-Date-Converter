@@ -7,7 +7,7 @@ import 'package:table_calendar/table_calendar.dart';
 import 'package:http/http.dart' as http;
 
 DateTime today = DateTime.now();
-String selectedDate = today.toString();
+String hijriDate = today.toString();
 
 class DateConvertor extends StatefulWidget {
   const DateConvertor({super.key});
@@ -25,6 +25,14 @@ class _DateConvertorState extends State<DateConvertor> {
   final FirebaseFirestore firestore = FirebaseFirestore.instance;
 
   TextEditingController eventData = TextEditingController();
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    displayHijriDate();
+  }
+
   void _onDaySelected(DateTime day, DateTime focusedDay) {
     setState(() {
       today = day;
@@ -47,81 +55,75 @@ class _DateConvertorState extends State<DateConvertor> {
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceAround,
           children: [
+            buildDateDisplayer(isGregorianColor: true, date: today),
             buildDateDisplayer(
-                isGregorianColor: true, date: dateFormaterr(selectedDate)),
-            buildDateDisplayer(isGregorianColor: false, date: today),
+                isGregorianColor: false, date: dateFormaterr(hijriDate)),
           ],
         ),
         ElevatedButton(
             onPressed: () {
-              showModalBottomSheet(
-                  useSafeArea: true,
-                  context: context,
-                  builder: (BuildContext context) {
-                    return Container(
-                      height: 200,
-                      child: Column(
-                        children: [
-                          TextFormField(
-                            controller: eventData,
-                            decoration: const InputDecoration(
-                              errorMaxLines: 2,
-                              labelText: 'Enter text',
-                              hintText: 'Enter your text here',
-                            ),
-                          ),
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceAround,
-                            children: [
-                              SizedBox(
-                                height: 40,
-                                width: 100,
-                                child: ElevatedButton(
-                                  style: ButtonStyle(
-                                    backgroundColor:
-                                        MaterialStateProperty.all<Color>(Colors
-                                            .red), // Set the desired color here
-                                  ),
-                                  onPressed: () {
-                                    Navigator.pop(context);
-                                  },
-                                  child: Text('Cancel'),
-                                ),
-                              ),
-                              SizedBox(
-                                height: 40,
-                                width: 100,
-                                child: ElevatedButton(
-                                  style: ButtonStyle(
-                                    backgroundColor:
-                                        MaterialStateProperty.all<Color>(Colors
-                                            .green), // Set the desired color here
-                                  ),
-                                  onPressed: () {
-                                    addDataToFirebase(eventData.text, today);
-                                    // Map<String, dynamic> data = {
-                                    //   today.toString(),
-                                    //   ""
-                                    // } as Map<String, dynamic>;
-                                    // FirebaseFirestore.instance
-                                    //     .collection("Events")
-                                    //     .add(data);
-                                    Navigator.pop(context);
-                                    //Add the data to the Data Base .
-                                  },
-                                  child: Text('Add'),
-                                ),
-                              ),
-                            ],
-                          ),
-                        ],
-                      ),
-                    );
-                  });
+              buildBottomSheet(context);
             },
             child: Text("Add Event")),
       ])),
     );
+  }
+
+  Future<dynamic> buildBottomSheet(BuildContext context) {
+    return showModalBottomSheet(
+        useSafeArea: true,
+        context: context,
+        builder: (BuildContext context) {
+          return Container(
+            height: 200,
+            child: Column(
+              children: [
+                TextFormField(
+                  controller: eventData,
+                  decoration: const InputDecoration(
+                    errorMaxLines: 2,
+                    labelText: 'Enter text',
+                    hintText: 'Enter your text here',
+                  ),
+                ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceAround,
+                  children: [
+                    SizedBox(
+                      height: 40,
+                      width: 100,
+                      child: ElevatedButton(
+                        style: ButtonStyle(
+                          backgroundColor: MaterialStateProperty.all<Color>(
+                              Colors.red), // Set the desired color here
+                        ),
+                        onPressed: () {
+                          Navigator.pop(context);
+                        },
+                        child: Text('Cancel'),
+                      ),
+                    ),
+                    SizedBox(
+                      height: 40,
+                      width: 100,
+                      child: ElevatedButton(
+                        style: ButtonStyle(
+                          backgroundColor: MaterialStateProperty.all<Color>(
+                              Colors.green), // Set the desired color here
+                        ),
+                        onPressed: () {
+                          addDataToFirebase(eventData.text, today);
+                          Navigator.pop(context);
+                        },
+                        child: Text('Add'),
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          );
+        });
   }
 
   void addDataToFirebase(String text, DateTime selectedDate) {
@@ -147,7 +149,7 @@ class _DateConvertorState extends State<DateConvertor> {
 
   displayHijriDate() async {
     String gregorianDate = dateFormater();
-    selectedDate = gregorianDate;
+    hijriDate = gregorianDate;
     if (gregorianDate.isNotEmpty) {
       // Call API to convert date
       String hijriDate = await convertDate(gregorianDate);
@@ -155,10 +157,6 @@ class _DateConvertorState extends State<DateConvertor> {
         dateTest = hijriDate;
       });
     }
-  }
-
-  String getTodayDate() {
-    return DateFormat('dd-mm-yyy').format(today);
   }
 
   Future<String> convertDate(String gregorianDate) async {
