@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:app/Models/EventData.dart';
 import 'package:app/Presentation/Widgets/date_displayer.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 // ignore: depend_on_referenced_packages
@@ -130,15 +131,11 @@ class _DateConvertorState extends State<DateConvertor> {
         });
   }
 
-  void addDataToFirebase(String text, DateTime selectedDate) {
-    firestore.collection('Data').add({
-      'text': text,
-      'date': DateFormat('dd-MM-yyyy').format(selectedDate),
-    }).then((value) {
-      // Data added successfully
-    }).catchError((error) {
-      // Error occurred while adding data
-    });
+  Future addDataToFirebase(String text, DateTime selectedDate) async {
+    final docData = FirebaseFirestore.instance.collection("Data").doc();
+    final eventData = EventData(date: selectedDate, text: text);
+    final json = eventData.toJson();
+    await docData.set(json);
   }
 
   TableCalendar<dynamic> buildTableCalendar() {
@@ -157,9 +154,7 @@ class _DateConvertorState extends State<DateConvertor> {
     if (gregorianDate.isNotEmpty) {
       // Call API to convert date
       String hijriDate = await getHijriDate(gregorianDate);
-      print("Hijri ? ::: $hijriDate");
       DateTime formatedHijriDate = formatHijriDate(hijriDate);
-      print(" hiijjrriiii ??? $formatedHijriDate");
       setState(() {
         theFormatedHijriDate =
             DateFormat('yyyy-MM-dd').format(formatedHijriDate);
@@ -174,8 +169,6 @@ class _DateConvertorState extends State<DateConvertor> {
     int month = int.parse(dateParts[1]);
     int day = int.parse(dateParts[0]);
     DateTime formatedHijriDate = DateTime(year, month, day);
-
-    print("Formated Hijri Date :::: $formatedHijriDate");
     return formatedHijriDate;
   }
 

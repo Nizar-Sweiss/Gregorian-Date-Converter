@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:hijri/hijri_calendar.dart';
 
 // ignore: must_be_immutable
 class BuildDateDisplayer extends StatelessWidget {

@@ -1,6 +1,6 @@
-import 'package:app/Presentation/display_events_screen.dart';
+import 'package:app/Presentation/Pages/display_events_screen.dart';
 import 'package:flutter/material.dart';
-import '../date_convertor_class.dart';
+import 'date_convertor_class.dart';
 
 class MainScreen extends StatefulWidget {
   const MainScreen({super.key});
@@ -18,7 +18,10 @@ class _MainScreenState extends State<MainScreen> {
     });
   }
 
-  List<Widget> widgetOptions = <Widget>[DateConvertor(), DisplayEvent()];
+  List<Widget> widgetOptions = <Widget>[
+    const DateConvertor(),
+    const DisplayEvent()
+  ];
   @override
   Widget build(BuildContext context) {
     return Scaffold(
