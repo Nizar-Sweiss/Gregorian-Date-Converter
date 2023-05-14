@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'package:app/Models/EventData.dart';
+import 'package:app/Presentation/Pages/screen2.dart';
 import 'package:app/Presentation/Widgets/date_displayer.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 // ignore: depend_on_referenced_packages
@@ -7,6 +8,8 @@ import 'package:intl/intl.dart';
 import 'package:flutter/material.dart';
 import 'package:table_calendar/table_calendar.dart';
 import 'package:http/http.dart' as http;
+
+import '../../Utils/util.dart';
 
 DateTime today = DateTime.now();
 String hijriDate = today.toString();
@@ -70,6 +73,15 @@ class _DateConvertorState extends State<DateConvertor> {
                   buildBottomSheet(context);
                 },
                 child: const Text("Add Event")),
+            TextButton(
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => const DisplayEventScreen()),
+                  );
+                },
+                child: Text("data"))
           ])),
     );
   }
@@ -118,6 +130,7 @@ class _DateConvertorState extends State<DateConvertor> {
                         ),
                         onPressed: () {
                           addDataToFirebase(eventData.text, today);
+                          // Utils.showSnackBar("Added Successfuly ", true);
                           Navigator.pop(context);
                         },
                         child: const Text('Add'),
@@ -133,7 +146,7 @@ class _DateConvertorState extends State<DateConvertor> {
 
   Future addDataToFirebase(String text, DateTime selectedDate) async {
     final docData = FirebaseFirestore.instance.collection("Data").doc();
-    final eventData = EventData(date: selectedDate, text: text);
+    final eventData = EventData(date: selectedDate.toString(), text: text);
     final json = eventData.toJson();
     await docData.set(json);
   }
