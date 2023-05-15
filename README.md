@@ -1,9 +1,7 @@
 # Gregorian-Date-Converter
 <!DOCTYPE html>
 <html>
-<head>
-  <title>Flutter Date Converter and Event Manager</title>
-</head>
+
 <body>
   <h1>Flutter Date Converter and Event Manager</h1>
 
