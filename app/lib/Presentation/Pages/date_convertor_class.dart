@@ -27,8 +27,6 @@ class _DateConvertorState extends State<DateConvertor> {
 
   String theFormatedHijriDate = DateFormat('yyyy-MM-dd').format(today);
 
-  final FirebaseFirestore firestore = FirebaseFirestore.instance;
-
   TextEditingController eventData = TextEditingController();
 
   @override
