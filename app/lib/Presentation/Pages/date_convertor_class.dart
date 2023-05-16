@@ -1,17 +1,13 @@
-import 'dart:convert';
 import 'package:app/Config/Theme/colors_palets.dart';
 import 'package:app/Data/DataSources/Local/firebase_maneger.dart';
-import 'package:app/Models/EventData.dart';
-import 'package:app/Presentation/Pages/display_events_screen.dart';
+import 'package:app/Data/DataSources/Remote/convert_hijri_api.dart';
+import 'package:app/Models/date_formater.dart';
 import 'package:app/Presentation/Widgets/date_displayer.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
+
 // ignore: depend_on_referenced_packages
 import 'package:intl/intl.dart';
 import 'package:flutter/material.dart';
 import 'package:table_calendar/table_calendar.dart';
-import 'package:http/http.dart' as http;
-
-import '../../Utils/util.dart';
 
 DateTime today = DateTime.now();
 String hijriDate = today.toString();
@@ -42,7 +38,7 @@ class _DateConvertorState extends State<DateConvertor> {
       today = day;
 
       displayHijriDate();
-      formatHijriDate(theFormatedHijriDate);
+      DateFormater.formatHijriDate(theFormatedHijriDate);
     });
   }
 
@@ -67,79 +63,80 @@ class _DateConvertorState extends State<DateConvertor> {
                     date: DateTime.parse(theFormatedHijriDate)),
               ],
             ),
-            Container(
-              color: AppColors.light_purple,
-              child: Row(
-                children: [
-                  Expanded(
-                    flex: 2,
-                    child: Center(
-                      child: Container(
-                        height: 40,
-                        color: AppColors.light_purple,
-                        child: Center(
-                            child: Text(
-                          DateFormat('EEEE MMMM dd, yyyy').format(today),
-                          style: TextStyle(
-                            color: AppColors.white_Text,
-                          ),
-                        )),
+            buildAddEventButton(context),
+          ])),
+    );
+  }
+
+  Container buildAddEventButton(BuildContext context) {
+    return Container(
+      color: AppColors.light_purple,
+      child: Row(
+        children: [
+          Expanded(
+            flex: 2,
+            child: Center(
+              child: Container(
+                height: 40,
+                color: AppColors.light_purple,
+                child: Center(
+                    child: Text(
+                  DateFormat('EEEE MMMM dd, yyyy').format(today),
+                  style: TextStyle(
+                    color: AppColors.white_Text,
+                  ),
+                )),
+              ),
+            ),
+          ),
+          Expanded(
+              flex: 1,
+              child: Container(
+                height: 40,
+                decoration: const BoxDecoration(
+                  borderRadius: BorderRadius.only(
+                    topLeft: Radius.circular(20),
+                    bottomLeft: Radius.circular(20),
+                  ),
+                  gradient: LinearGradient(
+                    colors: [AppColors.dark_purple, AppColors.light_purple],
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                  ),
+                ),
+                child: ElevatedButton(
+                  onPressed: () {
+                    buildBottomSheet(context);
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.transparent,
+                    elevation: 0,
+                    shape: const RoundedRectangleBorder(
+                      borderRadius: BorderRadius.only(
+                        topLeft: Radius.circular(20),
+                        bottomLeft: Radius.circular(20),
                       ),
                     ),
                   ),
-                  Expanded(
-                      flex: 1,
-                      child: Container(
-                        height: 40,
-                        decoration: const BoxDecoration(
-                          borderRadius: BorderRadius.only(
-                            topLeft: Radius.circular(20),
-                            bottomLeft: Radius.circular(20),
-                          ),
-                          gradient: LinearGradient(
-                            colors: [
-                              AppColors.dark_purple,
-                              AppColors.light_purple
-                            ],
-                            begin: Alignment.topLeft,
-                            end: Alignment.bottomRight,
+                  child: const Row(
+                    children: [
+                      Expanded(flex: 1, child: Icon(Icons.add)),
+                      Expanded(
+                        flex: 3,
+                        child: Text(
+                          'Add Event',
+                          style: TextStyle(
+                            color: AppColors.white_Text,
+                            fontWeight: FontWeight.bold,
                           ),
                         ),
-                        child: ElevatedButton(
-                          onPressed: () {
-                            buildBottomSheet(context);
-                          },
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: Colors.transparent,
-                            elevation: 0,
-                            shape: const RoundedRectangleBorder(
-                              borderRadius: BorderRadius.only(
-                                topLeft: Radius.circular(20),
-                                bottomLeft: Radius.circular(20),
-                              ),
-                            ),
-                          ),
-                          child: const Row(
-                            children: [
-                              Expanded(flex: 1, child: Icon(Icons.add)),
-                              Expanded(
-                                flex: 3,
-                                child: Text(
-                                  'Add Event',
-                                  style: TextStyle(
-                                    color: AppColors.white_Text,
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ))
-                ],
-              ),
-            ),
-          ])),
+                      ),
+                    ],
+                  ),
+                ),
+              ))
+        ],
+      ),
     );
   }
 
@@ -230,47 +227,16 @@ class _DateConvertorState extends State<DateConvertor> {
   }
 
   displayHijriDate() async {
-    String gregorianDate = dateFormater();
+    String gregorianDate = DateFormater.dateFormater();
     hijriDate = gregorianDate;
     if (gregorianDate.isNotEmpty) {
       // Call API to convert date
-      String hijriDate = await getHijriDate(gregorianDate);
-      DateTime formatedHijriDate = formatHijriDate(hijriDate);
+      String hijriDate = await ConvertHijri.getHijriDate(gregorianDate);
+      DateTime formatedHijriDate = DateFormater.formatHijriDate(hijriDate);
       setState(() {
         theFormatedHijriDate =
             DateFormat('yyyy-MM-dd').format(formatedHijriDate);
       });
     }
-  }
-
-  DateTime formatHijriDate(String hijridate) {
-    List<String> dateParts = hijridate.split('-');
-
-    int year = int.parse(dateParts[2]);
-    int month = int.parse(dateParts[1]);
-    int day = int.parse(dateParts[0]);
-    DateTime formatedHijriDate = DateTime(year, month, day);
-    return formatedHijriDate;
-  }
-
-  Future<String> getHijriDate(String gregorianDate) async {
-    final url = Uri.parse('http://api.aladhan.com/v1/gToH/$gregorianDate');
-    final response = await http.get(url);
-    if (response.statusCode == 200) {
-      final jsonResponse = jsonDecode(response.body);
-      hijriDate = jsonResponse['data']['hijri']['date'];
-      return jsonResponse['data']['hijri']['date'];
-    } else {
-      throw Exception('Failed to convert date');
-    }
-  }
-
-  String dateFormater() {
-    String dateString = today.toString().split(" ")[0];
-    DateFormat inputFormat = DateFormat('yyyy-MM-dd');
-    DateTime date = inputFormat.parse(dateString);
-    var formate1 = "${date.day}-${date.month}-${date.year}";
-
-    return formate1;
   }
 }
