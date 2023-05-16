@@ -26,6 +26,7 @@ class _MainScreenState extends State<MainScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: AppColors.dark_purple,
       body: SafeArea(
         child: Center(
           child: widgetOptions.elementAt(_selectedIndex),
