@@ -1,3 +1,4 @@
+import 'package:app/Config/Theme/colors_palets.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
@@ -11,21 +12,22 @@ class BuildDateDisplayer extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    print("DAtee in CW ::::: $date");
     return Column(
       mainAxisSize: MainAxisSize.max,
       children: [
         Text(
           isGregorianColor ? "Gregorian" : "Hijri",
-          style: const TextStyle(color: Color.fromARGB(255, 0, 0, 0)),
+          style: const TextStyle(
+            color: AppColors.white_Text,
+          ),
         ),
         Container(
           width: 120,
           height: 21,
           decoration: BoxDecoration(
               color: isGregorianColor
-                  ? const Color.fromARGB(255, 223, 41, 0)
-                  : const Color.fromARGB(255, 0, 115, 202),
+                  ? AppColors.light_purple
+                  : AppColors.red_tint_2,
               borderRadius: const BorderRadius.only(
                   topLeft: Radius.circular(20), topRight: Radius.circular(20)),
               border: Border.all(color: Colors.black)),

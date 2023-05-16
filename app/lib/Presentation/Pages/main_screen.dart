@@ -1,3 +1,4 @@
+import 'package:app/Config/Theme/colors_palets.dart';
 import 'package:app/Presentation/Pages/display_events_screen.dart';
 import 'package:flutter/material.dart';
 import 'date_convertor_class.dart';
@@ -20,7 +21,7 @@ class _MainScreenState extends State<MainScreen> {
 
   List<Widget> widgetOptions = <Widget>[
     const DateConvertor(),
-    const DisplayEvent()
+    const DisplayEventScreen()
   ];
   @override
   Widget build(BuildContext context) {
@@ -38,16 +39,20 @@ class _MainScreenState extends State<MainScreen> {
     return BottomNavigationBar(
       items: const <BottomNavigationBarItem>[
         BottomNavigationBarItem(
-          icon: Icon(Icons.home),
-          label: 'Home',
+          icon: Icon(Icons.star),
+          label: 'Hijri Planner',
         ),
         BottomNavigationBarItem(
-          icon: Icon(Icons.date_range),
-          label: 'Calender',
+          icon: Icon(
+            Icons.date_range,
+          ),
+          label: 'Events',
         ),
       ],
       currentIndex: _selectedIndex,
-      selectedItemColor: const Color.fromARGB(255, 82, 42, 145),
+      selectedItemColor: AppColors.red_tint_1,
+      backgroundColor: AppColors.dark_purple,
+      unselectedItemColor: AppColors.white_Text,
       onTap: _onItemTapped,
     );
   }

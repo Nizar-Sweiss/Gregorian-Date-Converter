@@ -3,14 +3,14 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
-class DisplayEvent extends StatefulWidget {
-  const DisplayEvent({super.key});
+class DisplayEventScreen extends StatefulWidget {
+  const DisplayEventScreen({super.key});
 
   @override
-  State<DisplayEvent> createState() => _DisplayEventState();
+  State<DisplayEventScreen> createState() => _DisplayEventScreenState();
 }
 
-class _DisplayEventState extends State<DisplayEvent> {
+class _DisplayEventScreenState extends State<DisplayEventScreen> {
   @override
   Widget build(BuildContext context) {
     return StreamBuilder<QuerySnapshot>(
@@ -19,7 +19,7 @@ class _DisplayEventState extends State<DisplayEvent> {
         if (!snapshot.hasData) {
           return const CircularProgressIndicator(); // Show a loading indicator
         }
-
+        //Fetch the Data From Firebase
         return ListView.builder(
           itemCount: snapshot.data!.docs.length,
           itemBuilder: (BuildContext context, int index) {

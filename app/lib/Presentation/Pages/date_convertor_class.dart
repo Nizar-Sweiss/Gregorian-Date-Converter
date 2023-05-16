@@ -1,6 +1,8 @@
 import 'dart:convert';
+import 'package:app/Config/Theme/colors_palets.dart';
+import 'package:app/Data/DataSources/Local/firebase_maneger.dart';
 import 'package:app/Models/EventData.dart';
-import 'package:app/Presentation/Pages/screen2.dart';
+import 'package:app/Presentation/Pages/display_events_screen.dart';
 import 'package:app/Presentation/Widgets/date_displayer.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 // ignore: depend_on_referenced_packages
@@ -47,16 +49,15 @@ class _DateConvertorState extends State<DateConvertor> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text("Date Convertor"),
-      ),
+      backgroundColor: AppColors.dark_purple,
       body: Center(
           child: Column(
               mainAxisAlignment: MainAxisAlignment.spaceAround,
               children: [
-            buildTableCalendar(),
-            Text(
-                "Selected Date : ${today.toString().split(" ")[0]} ,In Hijri : $theFormatedHijriDate"),
+            Container(
+              color: AppColors.dark_purple,
+              child: buildTableCalendar(),
+            ),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceAround,
               children: [
@@ -66,20 +67,78 @@ class _DateConvertorState extends State<DateConvertor> {
                     date: DateTime.parse(theFormatedHijriDate)),
               ],
             ),
-            ElevatedButton(
-                onPressed: () {
-                  buildBottomSheet(context);
-                },
-                child: const Text("Add Event")),
-            TextButton(
-                onPressed: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                        builder: (context) => const DisplayEventScreen()),
-                  );
-                },
-                child: Text("data"))
+            Container(
+              color: AppColors.light_purple,
+              child: Row(
+                children: [
+                  Expanded(
+                    flex: 2,
+                    child: Center(
+                      child: Container(
+                        height: 40,
+                        color: AppColors.light_purple,
+                        child: Center(
+                            child: Text(
+                          DateFormat('EEEE MMMM dd, yyyy').format(today),
+                          style: TextStyle(
+                            color: AppColors.white_Text,
+                          ),
+                        )),
+                      ),
+                    ),
+                  ),
+                  Expanded(
+                      flex: 1,
+                      child: Container(
+                        height: 40,
+                        decoration: const BoxDecoration(
+                          borderRadius: BorderRadius.only(
+                            topLeft: Radius.circular(20),
+                            bottomLeft: Radius.circular(20),
+                          ),
+                          gradient: LinearGradient(
+                            colors: [
+                              AppColors.dark_purple,
+                              AppColors.light_purple
+                            ],
+                            begin: Alignment.topLeft,
+                            end: Alignment.bottomRight,
+                          ),
+                        ),
+                        child: ElevatedButton(
+                          onPressed: () {
+                            buildBottomSheet(context);
+                          },
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.transparent,
+                            elevation: 0,
+                            shape: const RoundedRectangleBorder(
+                              borderRadius: BorderRadius.only(
+                                topLeft: Radius.circular(20),
+                                bottomLeft: Radius.circular(20),
+                              ),
+                            ),
+                          ),
+                          child: const Row(
+                            children: [
+                              Expanded(flex: 1, child: Icon(Icons.add)),
+                              Expanded(
+                                flex: 3,
+                                child: Text(
+                                  'Add Event',
+                                  style: TextStyle(
+                                    color: AppColors.white_Text,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ))
+                ],
+              ),
+            ),
           ])),
     );
   }
@@ -127,7 +186,8 @@ class _DateConvertorState extends State<DateConvertor> {
                               Colors.green), // Set the desired color here
                         ),
                         onPressed: () {
-                          addDataToFirebase(eventData.text, today);
+                          FireBaseManeger.addDataToFirebase(
+                              eventData.text, today);
                           // Utils.showSnackBar("Added Successfuly ", true);
                           Navigator.pop(context);
                         },
@@ -142,20 +202,30 @@ class _DateConvertorState extends State<DateConvertor> {
         });
   }
 
-  Future addDataToFirebase(String text, DateTime selectedDate) async {
-    final docData = FirebaseFirestore.instance.collection("Data").doc();
-    final eventData = EventData(date: selectedDate.toString(), text: text);
-    final json = eventData.toJson();
-    await docData.set(json);
-  }
-
   TableCalendar<dynamic> buildTableCalendar() {
     return TableCalendar(
+      calendarStyle: const CalendarStyle(
+          defaultDecoration: BoxDecoration(shape: BoxShape.circle),
+          defaultTextStyle: TextStyle(
+            color: AppColors.white_Text,
+            decorationColor: AppColors.white_Text,
+          )),
       selectedDayPredicate: (day) => isSameDay(day, today),
       focusedDay: today,
       firstDay: firstDay,
       lastDay: lastDay,
       onDaySelected: _onDaySelected,
+      headerStyle: const HeaderStyle(
+          titleTextStyle: TextStyle(
+        color: AppColors.white_Text,
+      )),
+      daysOfWeekStyle: const DaysOfWeekStyle(
+          weekendStyle: TextStyle(
+            color: AppColors.white_Text,
+          ),
+          weekdayStyle: TextStyle(
+            color: AppColors.white_Text,
+          )),
     );
   }
 
@@ -186,7 +256,6 @@ class _DateConvertorState extends State<DateConvertor> {
   Future<String> getHijriDate(String gregorianDate) async {
     final url = Uri.parse('http://api.aladhan.com/v1/gToH/$gregorianDate');
     final response = await http.get(url);
-    // print("Method res : ${response.body}");
     if (response.statusCode == 200) {
       final jsonResponse = jsonDecode(response.body);
       hijriDate = jsonResponse['data']['hijri']['date'];
@@ -201,15 +270,7 @@ class _DateConvertorState extends State<DateConvertor> {
     DateFormat inputFormat = DateFormat('yyyy-MM-dd');
     DateTime date = inputFormat.parse(dateString);
     var formate1 = "${date.day}-${date.month}-${date.year}";
-    print(formate1);
 
-    return formate1; // Output: Mon, May 9, 2023
-  }
-
-  DateTime dateFormaterr(String theDate) {
-    DateFormat inputFormat = DateFormat('yyyy-MM-dd');
-    DateTime date = inputFormat.parse(theDate);
-
-    return date;
+    return formate1;
   }
 }
