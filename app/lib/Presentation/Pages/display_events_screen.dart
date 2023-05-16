@@ -1,4 +1,5 @@
-import 'package:app/Presentation/Widgets/build_Event_Data.dart';
+import 'package:app/Config/Theme/colors_palets.dart';
+import 'package:app/Data/DataSources/Local/firebase_maneger.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
@@ -19,42 +20,21 @@ class _DisplayEventScreenState extends State<DisplayEventScreen> {
     _eventsStream = FirebaseFirestore.instance.collection('Data').snapshots();
   }
 
-  Future<void> _deleteEvent(String eventId) async {
-    try {
-      await FirebaseFirestore.instance.collection('Data').doc(eventId).delete();
-      // Show a success message or perform any additional actions
-    } catch (e) {
-      // Handle the error
-      print('Error deleting event: $e');
-    }
-  }
-
-  Future<void> _updateEvent(String eventId, String updatedText) async {
-    try {
-      await FirebaseFirestore.instance
-          .collection('Data')
-          .doc(eventId)
-          .update({'text': updatedText});
-      // Show a success message or perform any additional actions
-    } catch (e) {
-      // Handle the error
-      print('Error updating event: $e');
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
     return StreamBuilder<QuerySnapshot>(
       stream: _eventsStream,
       builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
-          return Center(
-            child: CircularProgressIndicator(),
+          return const Center(
+            child: CircularProgressIndicator(
+              color: AppColors.white_Text,
+            ),
           );
         }
 
         if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
-          return Center(
+          return const Center(
             child: Text('No events found.'),
           );
         }
@@ -73,21 +53,21 @@ class _DisplayEventScreenState extends State<DisplayEventScreen> {
               direction: DismissDirection.endToStart,
               background: Container(
                 alignment: Alignment.centerRight,
-                padding: EdgeInsets.symmetric(horizontal: 16),
-                color: Colors.red,
-                child: Icon(Icons.delete, color: Colors.white),
+                padding: const EdgeInsets.symmetric(horizontal: 16),
+                color: AppColors.red_error,
+                child: const Icon(Icons.delete, color: AppColors.white_Text),
               ),
-              onDismissed: (_) => _deleteEvent(eventId),
+              onDismissed: (_) => FireBaseManeger.deleteEvent(eventId),
               child: Card(
                 elevation: 2,
-                margin: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                 child: ListTile(
                   contentPadding:
-                      EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                      const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                   title: Text(formattedDate),
                   subtitle: Text(eventText),
                   trailing: IconButton(
-                    icon: Icon(Icons.edit),
+                    icon: const Icon(Icons.edit),
                     onPressed: () => _showEditDialog(eventId, eventText),
                   ),
                 ),
@@ -106,19 +86,19 @@ class _DisplayEventScreenState extends State<DisplayEventScreen> {
         TextEditingController textEditingController =
             TextEditingController(text: currentText);
         return AlertDialog(
-          title: Text('Edit Event'),
+          title: const Text('Edit Event'),
           content: TextField(
             controller: textEditingController,
           ),
           actions: <Widget>[
             TextButton(
-              child: Text('Cancel'),
+              child: const Text('Cancel'),
               onPressed: () {
                 Navigator.of(context).pop(currentText);
               },
             ),
             TextButton(
-              child: Text('Save'),
+              child: const Text('Save'),
               onPressed: () {
                 Navigator.of(context).pop(textEditingController.text);
               },
@@ -128,7 +108,7 @@ class _DisplayEventScreenState extends State<DisplayEventScreen> {
       },
     );
     if (updatedText != null && updatedText != currentText) {
-      _updateEvent(eventId, updatedText);
+      FireBaseManeger.updateEvent(eventId, updatedText);
     }
   }
 }
